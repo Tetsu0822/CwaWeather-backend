@@ -126,12 +126,37 @@ const getKaohsiungWeather = async (req, res) => {
   }
 };
 
+const getSunriseSunset = async (cityName) => {
+  try {
+    const response = await axios.get(
+      `${CWA_API_BASE_URL}/v1/rest/datastore/A-B0062-001`,
+      {
+        params: {
+          Authorization: CWA_API_KEY,
+          CountyName: cityName,
+        },
+      }
+    );
+
+    const locationData = response.data.records.locations.location[0];
+    const todayData = locationData.time[0]; // 假設只取今天的資料
+
+    return {
+      sunrise: todayData.SunRiseTime,
+      sunset: todayData.SunSetTime,
+    };
+  } catch (error) {
+    console.error("取得日出日落資料失敗:", error.message);
+    return { sunrise: "未知", sunset: "未知" }; // 回傳預設值
+  }
+};
+
 /**
  * 取得指定城市的天氣預報
  */
 const getCityWeather = async (req, res) => {
   try {
-    const cityName = req.query.city || "台北市"; // 預設為台北市
+    const cityName = req.query.city || "臺中市"; // 預設為臺中市
 
     if (!CWA_API_KEY) {
       return res.status(500).json({
@@ -140,7 +165,8 @@ const getCityWeather = async (req, res) => {
       });
     }
 
-    const response = await axios.get(
+    // 呼叫天氣 API
+    const weatherResponse = await axios.get(
       `${CWA_API_BASE_URL}/v1/rest/datastore/F-C0032-001`,
       {
         params: {
@@ -150,7 +176,7 @@ const getCityWeather = async (req, res) => {
       }
     );
 
-    const locationData = response.data.records.location[0];
+    const locationData = weatherResponse.data.records.location[0];
 
     if (!locationData) {
       return res.status(404).json({
@@ -159,12 +185,15 @@ const getCityWeather = async (req, res) => {
       });
     }
 
+    // 呼叫日出日落 API
+    const { sunrise, sunset } = await getSunriseSunset(cityName);
+
     const weatherData = {
       city: locationData.locationName,
-      updateTime: response.data.records.datasetDescription,
+      updateTime: weatherResponse.data.records.datasetDescription,
       forecasts: [],
-      sunrise: "06:00", // 假設固定值，需替換為真實 API 資料
-      sunset: "18:00", // 假設固定值，需替換為真實 API 資料
+      sunrise,
+      sunset,
     };
 
     const weatherElements = locationData.weatherElement;
