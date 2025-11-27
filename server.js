@@ -154,9 +154,106 @@ const getSunriseSunset = async (cityName) => {
 /**
  * 取得指定城市的天氣預報
  */
+// const getCityWeather = async (req, res) => {
+//   try {
+//     const cityName = req.query.city || "臺中市"; // 預設為臺中市
+
+//     if (!CWA_API_KEY) {
+//       return res.status(500).json({
+//         error: "伺服器設定錯誤",
+//         message: "請在 .env 檔案中設定 CWA_API_KEY",
+//       });
+//     }
+
+//     const response = await axios.get(
+//       `${CWA_API_BASE_URL}/v1/rest/datastore/F-C0032-001`,
+//       {
+//         params: {
+//           Authorization: CWA_API_KEY,
+//           locationName: cityName,
+//         },
+//       }
+//     );
+
+//     const locationData = response.data.records.location[0];
+
+//     if (!locationData) {
+//       return res.status(404).json({
+//         error: "查無資料",
+//         message: `無法取得 ${cityName} 天氣資料`,
+//       });
+//     }
+
+//     const weatherData = {
+//       city: locationData.locationName,
+//       updateTime: response.data.records.datasetDescription,
+//       forecasts: [],
+//       sunrise: "06:00", // 假設固定值，需替換為真實 API 資料
+//       sunset: "18:00", // 假設固定值，需替換為真實 API 資料
+//     };
+
+//     const weatherElements = locationData.weatherElement;
+//     const timeCount = weatherElements[0].time.length;
+
+//     for (let i = 0; i < timeCount; i++) {
+//       const forecast = {
+//         startTime: weatherElements[0].time[i].startTime,
+//         endTime: weatherElements[0].time[i].endTime,
+//         weather: "",
+//         rain: "",
+//         minTemp: "",
+//         maxTemp: "",
+//         comfort: "",
+//       };
+
+//       weatherElements.forEach((element) => {
+//         const value = element.time[i].parameter;
+//         switch (element.elementName) {
+//           case "Wx":
+//             forecast.weather = value.parameterName;
+//             break;
+//           case "PoP":
+//             forecast.rain = value.parameterName + "%";
+//             break;
+//           case "MinT":
+//             forecast.minTemp = value.parameterName + "°C";
+//             break;
+//           case "MaxT":
+//             forecast.maxTemp = value.parameterName + "°C";
+//             break;
+//           case "CI":
+//             forecast.comfort = value.parameterName;
+//             break;
+//         }
+//       });
+
+//       weatherData.forecasts.push(forecast);
+//     }
+
+//     res.json({
+//       success: true,
+//       data: weatherData,
+//     });
+//   } catch (error) {
+//     console.error("取得天氣資料失敗:", error.message);
+
+//     if (error.response) {
+//       return res.status(error.response.status).json({
+//         error: "CWA API 錯誤",
+//         message: error.response.data.message || "無法取得天氣資料",
+//         details: error.response.data,
+//       });
+//     }
+
+//     res.status(500).json({
+//       error: "伺服器錯誤",
+//       message: "無法取得天氣資料，請稍後再試",
+//     });
+//   }
+// };
 const getCityWeather = async (req, res) => {
   try {
-    const cityName = req.query.city || "臺中市"; // 預設為臺中市
+    const cityName = req.query.city || "台北市"; // 預設為台北市
 
     if (!CWA_API_KEY) {
       return res.status(500).json({
@@ -255,7 +352,6 @@ const getCityWeather = async (req, res) => {
     });
   }
 };
-
 /**
  * 生成天氣分享內容
  */
