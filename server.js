@@ -255,6 +255,8 @@ app.get("/", (req, res) => {
     endpoints: {
       kaohsiung: "/api/weather/kaohsiung",
       health: "/api/health",
+      cityWeather: "/api/weather?city=城市名稱",
+      shareWeather: "/api/share?city=城市名稱&weather=天氣描述&temperature=氣溫",
     },
   });
 });
